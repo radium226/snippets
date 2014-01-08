@@ -1,4 +1,2 @@
-C-Snippets
+Snippets
 ==========
-
-C Snippets
