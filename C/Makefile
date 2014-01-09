@@ -6,10 +6,12 @@ all: run
 run: 
 	echo $(shell pwd)
 	@for snippet in $(SNIPPETS) ; do \
-		echo " -={ $$( basename $${snippet} ) }=-" ; \
-		cd $$snippet ; \
-		$(MAKE) $@ ; \
-		echo ; \
-		cd .. ; \
+		if [ -f "$${snippet}/Makefile" ]; then \
+			echo " -={ $$( basename $${snippet} ) }=-" ; \
+			cd $$snippet ; \
+			$(MAKE) $@ ; \
+			echo ; \
+			cd .. ; \
+		fi ; \
 	done
 
