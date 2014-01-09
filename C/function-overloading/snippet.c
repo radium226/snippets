@@ -1,8 +1,10 @@
+#include "snippet.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "array.h"
 
-int main(int argc, char** argv) {
+int main(int UNUSED(argc), char** UNUSED(argv)) {
     int length = 2;
     char **array = (char **) malloc(sizeof(char *) * length);
     
