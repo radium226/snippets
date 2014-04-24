@@ -18,22 +18,22 @@ $(ELFDIR)/hello.elf: | $(ELFDIR)
 		--input-target binary \
 		--output-target $(TARGET) \
 		--binary-architecture i386 \
-		--redefine-sym _binary_hello_txt_start=hello_start \
-		--redefine-sym _binary_hello_txt_end=hello_end \
-		--redefine-sym _binary_hello_txt_size=hello_size \
+		--redefine-sym _binary_hello_bin_start=hello_start \
+		--redefine-sym _binary_hello_bin_end=hello_end \
+		--redefine-sym _binary_hello_bin_size=hello_size \
 		--rename-section .data=.hello \
-			hello.txt $(ELFDIR)/hello.elf
+			hello.bin $(ELFDIR)/hello.elf
 	
 $(ELFDIR)/world.elf: | $(ELFDIR)
 	$(OBJCOPY) \
 		--input-target binary \
 		--output-target $(TARGET) \
 		--binary-architecture i386 \
-		--redefine-sym _binary_world_txt_start=world_start \
-		--redefine-sym _binary_world_txt_end=world_end \
-		--redefine-sym _binary_world_txt_size=world_size \
+		--redefine-sym _binary_world_bin_start=world_start \
+		--redefine-sym _binary_world_bin_end=world_end \
+		--redefine-sym _binary_world_bin_size=world_size \
 		--rename-section .data=.world \
-			world.txt $(ELFDIR)/world.elf
+			world.bin $(ELFDIR)/world.elf
 
 $(ELFDIR)/hello_world.elf: $(ELFDIR)/hello.elf $(ELFDIR)/world.elf | $(ELFDIR)
 	$(LD) --relocatable $(ELFDIR)/hello.elf $(ELFDIR)/world.elf --output $(ELFDIR)/hello_world.elf
