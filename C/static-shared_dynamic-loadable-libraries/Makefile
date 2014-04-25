@@ -14,7 +14,7 @@ snippet.o:
 	gcc -Iscream -Lscream -c snippet.c -o snippet.o
 
 snippet_static_libscream: snippet.o static_libscream
-	gcc -Iscream -Lscream snippet.o -lscream -o snippet_static_libscream
+	gcc -static -Iscream -Lscream snippet.o -lscream -o snippet_static_libscream
 
 snippet_shared_libscream: snippet.o shared_libscream
 	gcc -Iscream -Lscream snippet.o -lscream -o snippet_shared_libscream
