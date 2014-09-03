@@ -10,6 +10,11 @@ CREATE OR REPLACE PACKAGE date_util_pkg AS
     hh24_mi DATE);
 
   TYPE hh24_mi_tab_typ IS TABLE OF hh24_mi_typ;
+  
+  TYPE hh24_mi_ss_typ IS RECORD(
+    hh24_mi_ss DATE);
+
+  TYPE hh24_mi_ss_tab_typ IS TABLE OF hh24_mi_ss_typ;
 
   FUNCTION all_days_between(in_first_date IN DATE,
                             in_last_date  IN DATE) RETURN day_tab_typ
@@ -17,6 +22,16 @@ CREATE OR REPLACE PACKAGE date_util_pkg AS
 
   FUNCTION all_minutes_of(in_day_date IN DATE) RETURN hh24_mi_tab_typ
     PIPELINED;
+    
+  FUNCTION seconds_of(in_day_date IN DATE) RETURN hh24_mi_ss_tab_typ
+    PIPELINED;
+    
+  FUNCTION floor_to_minutes(in_date IN DATE, in_minutes IN NUMBER) RETURN DATE;
+  
+  FUNCTION
+    ceil_to_minutes(in_date IN DATE, in_minutes IN NUMBER)
+  RETURN
+    DATE;
 
 END;
 /
@@ -96,6 +111,53 @@ CREATE OR REPLACE PACKAGE BODY date_util_pkg AS
         CLOSE v_cursor;
       END IF;
       RAISE;
+  END;
+  
+  FUNCTION seconds_of(in_day_date IN DATE) RETURN hh24_mi_ss_tab_typ
+    PIPELINED IS
+    v_hh24_mi_ss hh24_mi_ss_typ;
+    CURSOR v_cursor IS
+      SELECT day_date + 1 - LEVEL / (24 * 60 * 60) hh24_mi
+      FROM   (SELECT trunc(in_day_date, 'DD') day_date FROM dual)
+      WHERE  day_date + 1 >= day_date
+      CONNECT BY day_date + (LEVEL) / (24 * 60 * 60) <
+                 day_date + 1 + 1 / (24 * 60 * 60)
+      ORDER  BY hh24_mi ASC;
+  BEGIN
+    OPEN v_cursor;
+    LOOP
+      FETCH v_cursor
+        INTO v_hh24_mi_ss;
+      EXIT WHEN v_cursor%NOTFOUND;
+      PIPE ROW(v_hh24_mi_ss);
+    END LOOP;
+    CLOSE v_cursor;
+  EXCEPTION
+    WHEN OTHERS THEN
+      IF v_cursor%ISOPEN THEN
+        CLOSE v_cursor;
+      END IF;
+      RAISE;
+  END;
+  
+  FUNCTION
+    floor_to_minutes(in_date IN DATE, in_minutes IN NUMBER)
+  RETURN
+    DATE
+  IS
+  
+  BEGIN
+    RETURN TRUNC(in_date, 'HH') +  (FLOOR(EXTRACT(MINUTE FROM CAST(in_date AS TIMESTAMP)) / in_minutes) * in_minutes) / (24 * 60);
+  END;
+  
+  FUNCTION
+    ceil_to_minutes(in_date IN DATE, in_minutes IN NUMBER)
+  RETURN
+    DATE
+  IS
+  
+  BEGIN
+    RETURN TRUNC(in_date, 'HH') +  (CEIL(EXTRACT(MINUTE FROM CAST(in_date AS TIMESTAMP)) / in_minutes) * in_minutes) / (24 * 60);
   END;
 
 END;
