@@ -59,3 +59,17 @@ FROM
 GROUP BY
   type,
   group_2;
+
+SELECT DISTINCT
+  p1.type, 
+  GREATEST(p1.start_date, p2.start_date) start_date, 
+  LEAST(p1.end_date, p2.end_date) end_date
+FROM
+  t_periods p1
+JOIN
+  t_periods p2
+ON
+      p1.type = p2.type
+WHERE
+     p2.start_date < p1.start_date AND p1.start_date < p2.end_date 
+  OR p2.start_date < p1.end_date AND p1.end_date < p2.end_date;
